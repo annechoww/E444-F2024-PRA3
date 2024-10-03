@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from project.app import app, db
+from project import models
 
 
 TEST_DB = "test.db"
@@ -86,3 +87,17 @@ def test_delete_message(client):
     rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
+
+
+def test_search(client):
+    """Ensure test is working"""
+    # Note: TEST DATA WILL BE DELETED ONCE TESTS FINISH
+    post1 = models.Post("First Test", "Test Content of the first post")
+    post2 = models.Post("Second Test", "Test Content of the second post")
+    db.session.add(post1)
+    db.session.add(post2)
+    db.session.commit()
+    query_param = "First"
+    rv = client.get(f"/search/?query={query_param}")
+    assert b"First" in rv.data
+    assert b"Second" not in rv.data
