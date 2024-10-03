@@ -97,7 +97,14 @@ def test_search(client):
     db.session.add(post1)
     db.session.add(post2)
     db.session.commit()
+    
+    # Test with query 
     query_param = "First"
     rv = client.get(f"/search/?query={query_param}")
     assert b"First" in rv.data
+    assert b"Second" not in rv.data
+
+    # Test empty search
+    rv = client.get(f"/search/?query=")
+    assert b"First" not in rv.data
     assert b"Second" not in rv.data
